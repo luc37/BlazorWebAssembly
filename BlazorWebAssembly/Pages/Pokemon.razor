@@ -1,0 +1,85 @@
+﻿@page "/pokemon"
+@using BlazorWebAssembly.Models.SourceApiModels
+@using BlazorWebAssembly.Models.ViewModels
+@using BlazorWebAssembly.Helpers
+@using Services.Api.Interfaces
+@using Config
+@inject IPokemonApiService _pokemonApiService
+
+<PageTitle>Pokemon</PageTitle>
+
+<h1>Pokemon</h1>
+
+@if (_thrownError)
+{
+    <p><em>@ErrorMessage</em></p>
+}
+else if (_loading)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pokemon in _pokemon)
+            {
+                <tr>
+                    <td>@(PageHelpers.GetProperName(pokemon.Name))</td>
+                    <td><img src="@pokemon.TileImageUrl" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private const string Endpoint = "/pokemon";
+    private const string ApiCall = Constants.BasePokemonApiUrl + Endpoint;
+    private const string ErrorMessage = Constants.DefaultErrorMessage;
+
+    private List<PokemonApiModel> _sourcePokemon = new List<PokemonApiModel>();
+    private List<PokemonViewModel> _pokemon = new List<PokemonViewModel>();
+
+    private bool _loading = true;
+    private bool _thrownError = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _sourcePokemon = await _pokemonApiService.ListPokemon(ApiCall);
+
+            for (int i = 0; i < _sourcePokemon.Count; i++)
+            {
+                await GetPokemonDetails(_sourcePokemon[i]);
+            }
+        }
+        catch
+        {
+            _thrownError = true;
+        }
+
+        _loading = false;
+    }
+
+    private async Task GetPokemonDetails(PokemonApiModel sourcePokemon)
+    {
+        sourcePokemon = await _pokemonApiService.GetPokemonDetails(sourcePokemon.Url);
+
+        var pokemonViewModel = new PokemonViewModel
+            {
+                Name = sourcePokemon.Name,
+                Url = sourcePokemon.Url,
+                TileImageUrl = sourcePokemon?.Sprites?.Front_default ?? string.Empty
+            };
+
+        _pokemon.Add(pokemonViewModel);
+    }
+}
