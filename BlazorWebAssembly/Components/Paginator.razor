@@ -1,0 +1,121 @@
+﻿<Pagination Alignment="Alignment.Center" Size="Size.Small">
+    <PaginationItem Disabled="@IsPageNavigationDisabled(PREVIOUS)" @onclick="Previous">
+        <PaginationLink>
+            <span aria-hidden="true">«</span>
+        </PaginationLink>
+    </PaginationItem>
+    @{
+        if (Pages < 4)
+        {
+            for (var i = 1; i <= Pages; i++)
+            {
+                var pageNumberAsString = i.ToString();
+                <PaginationItem @key="pageNumberAsString" Active="@IsActive(pageNumberAsString)">
+                    <PaginationLink Page="@pageNumberAsString" Clicked="SetActive">
+                        @pageNumberAsString
+                    </PaginationLink>
+                </PaginationItem>
+            }
+        }
+        else
+        {
+            if (CurrentPage < 5)
+            {
+                for (var i = 1; i < 6; i++)
+                {
+                    var pageNumberAsString = i.ToString();
+                    <PaginationItem @key="pageNumberAsString" Active="@IsActive(pageNumberAsString)">
+                        <PaginationLink Page="@pageNumberAsString" Clicked="SetActive">
+                            @pageNumberAsString
+                        </PaginationLink>
+                    </PaginationItem>
+                }
+                <Span>...</Span>
+            }
+            else if (CurrentPage > Pages - 5)
+            {
+                <Span>...</Span>
+                for (var i = Pages - 6; i < Pages; i++)
+                {
+                    var pageNumberAsString = i.ToString();
+                    <PaginationItem @key="pageNumberAsString" Active="@IsActive(pageNumberAsString)">
+                        <PaginationLink Page="@pageNumberAsString" Clicked="SetActive">
+                            @pageNumberAsString
+                        </PaginationLink>
+                    </PaginationItem>
+                }
+            }
+            else
+            {
+                <Span>...</Span>
+                for (var i = CurrentPage-2; i <= CurrentPage+2; i++)
+                {
+                    var pageNumberAsString = i.ToString();
+                    <PaginationItem @key="pageNumberAsString" Active="@IsActive(pageNumberAsString)">
+                        <PaginationLink Page="@pageNumberAsString" Clicked="SetActive">
+                            @pageNumberAsString
+                        </PaginationLink>
+                    </PaginationItem>
+                }
+                <Span>...</Span>
+            }
+        }
+    }
+    <PaginationItem Disabled="@IsPageNavigationDisabled(NEXT)" @onclick="Next">
+        <PaginationLink>
+            <span aria-hidden="true">»</span>
+        </PaginationLink>
+    </PaginationItem>
+</Pagination>
+
+@code
+{
+    [Parameter] public int Pages { get; set; }
+    [Parameter] public int CurrentPage { get; set; }
+    [Parameter] public EventCallback<int> NextPage { get; set; }
+    [Parameter] public EventCallback<int> PreviousPage { get; set; }
+    [Parameter] public EventCallback<int> PageChange { get; set; }
+
+    private const string PREVIOUS = "previous";
+    private const string NEXT = "next";
+
+    private bool IsActive(string page) => CurrentPage.ToString() == page;
+
+    private bool IsPageNavigationDisabled(string navigation)
+    {
+        if (navigation.Equals(PREVIOUS))
+        {
+            return CurrentPage.Equals(1);
+        }
+        else if (navigation.Equals(NEXT))
+        {
+            return CurrentPage.ToString().Equals(Pages.ToString());
+        }
+        return false;
+    }
+
+    private void Previous()
+    {
+        if (CurrentPage > 1)
+        {
+            CurrentPage = CurrentPage - 1;
+            PreviousPage.InvokeAsync(CurrentPage);
+        }
+    }
+
+    private void Next()
+    {
+        if (CurrentPage < Pages)
+        {
+            CurrentPage = CurrentPage + 1;
+            NextPage.InvokeAsync(CurrentPage);
+        }
+    }
+
+    private void SetActive(string page)
+    {
+        CurrentPage = int.Parse(page);
+        PageChange.InvokeAsync(CurrentPage);
+    }
+    
+}

@@ -1,0 +1,26 @@
+﻿<Bar Mode="BarMode.VerticalInline"
+        CollapseMode="BarCollapseMode.Hide"
+        Breakpoint="Breakpoint.Desktop"
+        NavigationBreakpoint="Breakpoint.Tablet"
+        ThemeContrast="ThemeContrast.Dark">
+    <BarMenu>
+        <BarStart>
+            <BarItem>
+                <BarLink To="@Constants.HomeRoute">
+                    <BarIcon IconName="IconName.Home" />
+                    Dashboard
+                </BarLink>
+            </BarItem>
+            <BarItem>
+                <BarLink To="@Constants.PokemonRoute">
+                    <BarIcon IconName="IconName.City" />
+                    Pokemon
+                </BarLink>
+            </BarItem>
+        </BarStart>
+    </BarMenu>
+</Bar>
+
+@code {
+
+}

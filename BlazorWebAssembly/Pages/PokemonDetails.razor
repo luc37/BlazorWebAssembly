@@ -1,0 +1,161 @@
+﻿@page "/pokemon/details/{Name}"
+
+@inject IPokemonApiService _pokemonApiService
+
+<PageTitle>@PageHelpers.GetProperName(Name)</PageTitle>
+
+@if (_thrownError)
+{
+    <p><em>@ErrorMessage</em></p>
+}
+else if (_loading)
+{
+    <LoadingAnimation Loading="_loading"></LoadingAnimation>
+}
+else
+{
+    <Container Fluid>
+        <Row>
+            <Column ColumnSize="ColumnSize.Is6.OnDesktop.Is12">
+                <Jumbotron Background="Background.Dark" Margin="Margin.Is4.FromBottom">
+                    <JumbotronTitle Size="JumbotronTitleSize.Is4">@PageHelpers.GetProperName(Name)</JumbotronTitle>
+                        <JumbotronSubtitle>
+                            @_pokemon.FlavourText
+                    </JumbotronSubtitle>
+                </Jumbotron>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is6.OnDesktop.Is12">
+                <img class="tile-image" src="@_pokemon.TileImageUrl" alt="todo" />
+            </Column>
+        </Row>
+        <Row>
+            <Column ColumnSize="ColumnSize.Is12">
+                <Tabs SelectedTab="@_selectedTab" SelectedTabChanged="@OnSelectedTabChanged" Class="scroll-x">
+                    <Items>
+                        <Tab Name="general">General</Tab>
+                        <Tab Name="species">Species</Tab>
+                        <Tab Name="abilities">Abilities</Tab>
+                        <Tab Name="moves">Moves</Tab>
+                        <Tab Name="stats">Stats</Tab>
+                        <Tab Name="held_items">Held Items</Tab>
+                    </Items>
+                    <Content>
+                        <TabPanel Name="general">
+                            <Card>
+                                <CardBody>
+                                    <CardText>
+                                        Base Experience: @_pokemon.Base_experience <br />
+                                        Order: @_pokemon.Order <br />
+                                        Height: @_pokemon.Height <br />
+                                        Weight: @_pokemon.Weight <br />
+                                    </CardText>
+                                </CardBody>
+                            </Card>
+                        </TabPanel>
+                        <TabPanel Name="species">
+                            <Card>
+                                <CardBody>
+                                    <CardText>
+                                        Base Happiness: @_species.Base_happiness <br />
+                                        Capture Rate: @_species.Capture_rate <br />
+                                    </CardText>
+                                </CardBody>
+                            </Card>
+                        </TabPanel>
+                        <TabPanel Name="abilities">
+                            <Card>
+                                <CardBody>
+                                    <CardText>
+                                        Content for abilities.
+                                    </CardText>
+                                </CardBody>
+                            </Card>
+                        </TabPanel>
+                        <TabPanel Name="moves">
+                            <Card>
+                                <CardBody>
+                                    <CardText>
+                                        Content for moves.
+                                    </CardText>
+                                </CardBody>
+                            </Card>
+                        </TabPanel>
+                        <TabPanel Name="stats">
+                            <Card>
+                                <CardBody>
+                                    <CardText>
+                                        Content for stats.
+                                    </CardText>
+                                </CardBody>
+                            </Card>
+                        </TabPanel>
+                        <TabPanel Name="held_items">
+                            <Card>
+                                <CardBody>
+                                    <CardText>
+                                        Content for held_items.
+                                    </CardText>
+                                </CardBody>
+                            </Card>
+                        </TabPanel>
+                    </Content>
+                </Tabs>
+            </Column>
+        </Row>
+    </Container>
+}
+
+@code {
+    [Parameter] public string Name { get; set; }
+
+    private const string Endpoint = "/pokemon";
+    private const string ApiCall = Constants.BasePokemonApiUrl + Endpoint;
+    private const string ErrorMessage = Constants.DefaultErrorMessage;
+
+    private PokemonApiModel _sourcePokemon = new PokemonApiModel();
+    private PokemonViewModel _pokemon = new PokemonViewModel();
+    private SpeciesApiModel _species = new SpeciesApiModel();
+
+    private string _selectedTab = "general";
+    private bool _loading = true;
+    private bool _thrownError = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetPageData(ApiCall + "/" + Name);
+    }
+
+    private async Task GetPageData(string url)
+    {
+        try
+        {
+            _loading = true;
+            _sourcePokemon = await _pokemonApiService.GetPokemonDetails(url);
+            _species = await _pokemonApiService.GetSpeciesDetails(_sourcePokemon.Species.Url);
+            _pokemon = new PokemonViewModel
+            {
+                Name = _sourcePokemon.Name,
+                Url = _sourcePokemon.Url,
+                TileImageUrl = _sourcePokemon?.Sprites?.Front_default ?? string.Empty,
+                Base_experience = _sourcePokemon.Base_experience,
+                Order = _sourcePokemon.Order,
+                Height = _sourcePokemon.Height,
+                Weight = _sourcePokemon.Weight,
+                FlavourText = _species.Flavor_text_entries[0].Flavor_text
+            };
+            
+        }
+        catch
+        {
+            _thrownError = true;
+        }
+
+        _loading = false;
+    }
+
+    private Task OnSelectedTabChanged(string name)
+    {
+        _selectedTab = name;
+        return Task.CompletedTask;
+    }
+}

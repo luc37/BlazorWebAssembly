@@ -1,3 +1,6 @@
+using Blazorise;
+using Blazorise.Icons.Material;
+using Blazorise.Material;
 using BlazorWebAssembly;
 using BlazorWebAssembly.Services.Api.Implementations;
 using BlazorWebAssembly.Services.Api.Interfaces;
@@ -7,6 +10,15 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
+
+//Blazirise
+builder.Services
+    .AddBlazorise(options =>
+    {
+        options.Immediate = true;
+    })
+    .AddMaterialProviders()
+    .AddMaterialIcons();
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

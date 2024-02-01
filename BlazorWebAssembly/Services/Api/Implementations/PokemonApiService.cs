@@ -7,21 +7,22 @@ namespace BlazorWebAssembly.Services.Api.Implementations
     {
         private readonly IApiService _apiService = apiService ?? throw new ArgumentNullException(nameof(IApiService));
 
-        public async Task<List<PokemonApiModel>> ListPokemon(string apiUrl)
+        public async Task<ListResponseApiModel<PokemonApiModel>> ListPokemon(string apiUrl)
         {
-            var sourcePokemonList = new List<PokemonApiModel>();
             var response = await _apiService.InvokeApiRequestGetAsync<ListResponseApiModel<PokemonApiModel>>(apiUrl);
-
-            if (response != null)
-                sourcePokemonList = response.Results.ToList();
-
-            return sourcePokemonList;
+            return response;
         }
 
         public async Task<PokemonApiModel> GetPokemonDetails(string apiUrl)
         {
             PokemonApiModel? sourcePokemon = await _apiService.InvokeApiRequestGetAsync<PokemonApiModel>(apiUrl);
             return sourcePokemon;
+        }
+
+        public async Task<SpeciesApiModel> GetSpeciesDetails(string apiUrl)
+        {
+            SpeciesApiModel? sourceSpecies = await _apiService.InvokeApiRequestGetAsync<SpeciesApiModel>(apiUrl);
+            return sourceSpecies;
         }
     }
 }

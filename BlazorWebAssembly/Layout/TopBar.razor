@@ -1,0 +1,29 @@
+﻿<Bar Breakpoint="Breakpoint.Tablet"
+     CollapseMode="BarCollapseMode.Small"
+     Background="Background.Light"
+     ThemeContrast="ThemeContrast.Light">
+    <BarBrand>
+        Blazor Web Assembley
+    </BarBrand>
+    <BarToggler />
+    <BarMenu>
+        <BarStart>
+            <BarItem>
+                <BarLink To="@Constants.HomeRoute">Home</BarLink>
+            </BarItem>
+            <BarItem>
+                <BarLink To="@Constants.PokemonRoute">Pokemon</BarLink>
+            </BarItem>
+        </BarStart>
+        <BarEnd>
+            <BarItem>
+                <Button Color="Color.Primary" Disabled>Sign up</Button>
+                <Button Color="Color.Secondary" Disabled>Log in</Button>
+            </BarItem>
+        </BarEnd>
+    </BarMenu>
+</Bar>
+
+@code {
+
+}

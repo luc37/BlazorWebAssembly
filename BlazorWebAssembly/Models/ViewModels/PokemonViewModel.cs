@@ -4,6 +4,7 @@ namespace BlazorWebAssembly.Models.ViewModels
 {
     public class PokemonViewModel : PokemonApiModel
     {
-        public string TileImageUrl;
+        public string TileImageUrl { get; set; }
+        public string FlavourText { get; set; }
     }
 }

@@ -1,14 +1,8 @@
 ﻿@page "/pokemon"
-@using BlazorWebAssembly.Models.SourceApiModels
-@using BlazorWebAssembly.Models.ViewModels
-@using BlazorWebAssembly.Helpers
-@using Services.Api.Interfaces
-@using Config
+
 @inject IPokemonApiService _pokemonApiService
 
 <PageTitle>Pokemon</PageTitle>
-
-<h1>Pokemon</h1>
 
 @if (_thrownError)
 {
@@ -16,27 +10,85 @@
 }
 else if (_loading)
 {
-    <p><em>Loading...</em></p>
+    <LoadingAnimation Loading="_loading"></LoadingAnimation>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Image</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var pokemon in _pokemon)
-            {
-                <tr>
-                    <td>@(PageHelpers.GetProperName(pokemon.Name))</td>
-                    <td><img src="@pokemon.TileImageUrl" /></td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <Container Fluid>
+        @if(_viewType == ViewType.Table){
+            <Table Hoverable Bordered FixedColumns Resizable ResizeMode="TableResizeMode.Header">
+                    <TableHeader>
+                        <TableRow>
+                            <TableHeaderCell Width="@Width.Px(100)" FixedPosition="TableColumnFixedPosition.Start">
+                                <Button Clicked="@(() => ToggleView(ViewType.Grid))"><Icon Name="IconName.IdCard" /></Button>
+                            </TableHeaderCell>
+                            <TableHeaderCell Width="@Width.Px(150)">Name</TableHeaderCell>
+                            <TableHeaderCell Width="@Width.Px(75)">Base Exp.</TableHeaderCell>
+                            <TableHeaderCell Width="@Width.Px(75)">Order</TableHeaderCell>
+                            <TableHeaderCell Width="@Width.Px(75)">Height</TableHeaderCell>
+                            <TableHeaderCell Width="@Width.Px(75)">Weight</TableHeaderCell>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                    @foreach (var pokemon in _pokemon)
+                    {
+                        var detailsLink = "/pokemon/details/" + pokemon.Name;
+                        <TableRow>
+                            <TableRowCell FixedPosition="TableColumnFixedPosition.Start">
+                                <Blazorise.Link To="@detailsLink"><Image src="@pokemon.TileImageUrl" /></Blazorise.Link>
+                            </TableRowCell>
+                            <TableRowCell>
+                                <Blazorise.Link To="@detailsLink">@(PageHelpers.GetProperName(pokemon.Name))</Blazorise.Link>
+                            </TableRowCell>
+                            <TableRowCell>@pokemon.Base_experience</TableRowCell>
+                                <TableRowCell>@pokemon.Order</TableRowCell>
+                                <TableRowCell>@pokemon.Height</TableRowCell>
+                                <TableRowCell>@pokemon.Weight</TableRowCell>
+                            </TableRow>
+                    }
+                </TableBody>
+            </Table>
+            <Paginator Pages="_numberOfPages"
+                        NextPage="OnNextPageEvent"
+                        PreviousPage="OnPreviousPageEvent"
+                        PageChange="OnPageChangeEvent"
+                        CurrentPage="_currentPage" />
+        }
+
+        @if (_viewType == ViewType.Grid)
+        {
+
+            <Button Margin="Margin.Is2" Clicked="@(() => ToggleView(ViewType.Table))"><Icon Name="IconName.Bars" /></Button>
+
+            <CardDeck>
+                @foreach (var pokemon in _pokemon)
+                {
+                    var detailsLink = "/pokemon/details/" + pokemon.Name;
+                    <Blazorise.Link To="@detailsLink">
+                        <Card Margin="Margin.Is3.OnTablet.Is2" Height="Height.Px(300)">
+                            <CardImage Source="@pokemon.TileImageUrl" Alt="todo" Class="pokemon-card-image"></CardImage>
+                            <CardBody>
+                                <CardTitle Size="5">@(PageHelpers.GetProperName(pokemon.Name))</CardTitle>
+                                <CardText>
+                                    Base Experience: @pokemon.Base_experience <br />
+                                    Order: @pokemon.Order <br />
+                                    Height: @pokemon.Height <br />
+                                    Weight: @pokemon.Weight <br />
+                                </CardText>
+                            </CardBody>
+                        </Card>
+                    </Blazorise.Link>
+                }
+            </CardDeck>
+
+            <Paginator Pages="_numberOfPages"
+                       NextPage="OnNextPageEvent"
+                       PreviousPage="OnPreviousPageEvent"
+                       PageChange="OnPageChangeEvent"
+                       CurrentPage="_currentPage" />
+        }
+
+    </Container>
 }
 
 @code {
@@ -44,21 +96,33 @@ else
     private const string ApiCall = Constants.BasePokemonApiUrl + Endpoint;
     private const string ErrorMessage = Constants.DefaultErrorMessage;
 
-    private List<PokemonApiModel> _sourcePokemon = new List<PokemonApiModel>();
+    private ListResponseApiModel<PokemonApiModel> _sourcePokemonResponse = new ListResponseApiModel<PokemonApiModel>();
     private List<PokemonViewModel> _pokemon = new List<PokemonViewModel>();
 
+    private int _itemsPerPage = Constants.DefaultItemsPerPage;
+    private int _numberOfPages = 1;
+    private int _currentPage = 1;
     private bool _loading = true;
     private bool _thrownError = false;
+    private ViewType _viewType = ViewType.Table;
 
     protected override async Task OnInitializedAsync()
     {
+        await GetPageData(ApiCall + "?limit=" + _itemsPerPage.ToString());
+    }
+
+    private async Task GetPageData(string url)
+    {
         try
         {
-            _sourcePokemon = await _pokemonApiService.ListPokemon(ApiCall);
+            _loading = true;
+            _pokemon = new List<PokemonViewModel>();
+            _sourcePokemonResponse = await _pokemonApiService.ListPokemon(url);
+            _numberOfPages = _sourcePokemonResponse.Count / _itemsPerPage;
 
-            for (int i = 0; i < _sourcePokemon.Count; i++)
+            for (int i = 0; i < _sourcePokemonResponse.Results.Count(); i++)
             {
-                await GetPokemonDetails(_sourcePokemon[i]);
+                await GetPokemonDetails(_sourcePokemonResponse.Results[i]);
             }
         }
         catch
@@ -67,7 +131,7 @@ else
         }
 
         _loading = false;
-    }
+    } 
 
     private async Task GetPokemonDetails(PokemonApiModel sourcePokemon)
     {
@@ -77,9 +141,37 @@ else
             {
                 Name = sourcePokemon.Name,
                 Url = sourcePokemon.Url,
-                TileImageUrl = sourcePokemon?.Sprites?.Front_default ?? string.Empty
+                TileImageUrl = sourcePokemon?.Sprites?.Front_default ?? string.Empty,
+                Base_experience = sourcePokemon.Base_experience,
+                Order = sourcePokemon.Order,
+                Height = sourcePokemon.Height,
+                Weight = sourcePokemon.Weight
             };
 
         _pokemon.Add(pokemonViewModel);
+    }
+
+    private async Task OnNextPageEvent(int page)
+    {
+        await GetPageData(_sourcePokemonResponse.Next);
+        _currentPage = page;
+    }
+
+    private async Task OnPreviousPageEvent(int page)
+    {
+        await GetPageData(_sourcePokemonResponse.Previous);
+        _currentPage = page;
+    }
+
+    private async Task OnPageChangeEvent(int page)
+    {
+        var urlParams = "?limit=" + _itemsPerPage.ToString() + "&offset=" + (page * _itemsPerPage).ToString();
+        await GetPageData(ApiCall + urlParams);
+        _currentPage = page;
+    }
+
+    private void ToggleView(ViewType viewType)
+    {
+        _viewType = viewType;
     }
 }

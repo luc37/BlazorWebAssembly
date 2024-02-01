@@ -1,0 +1,14 @@
+﻿<LoadingIndicator @bind-Visible="@Loading" FullScreen FadeIn>
+    <IndicatorTemplate>
+        <Animate Animation="Animations.FadeDownRight" Auto>
+            <div class="loading-symbol-center">
+                <SpinKit Type="SpinKitType.Chase" Size="75px" />
+            </div>
+        </Animate>
+    </IndicatorTemplate>
+</LoadingIndicator>
+
+@code {
+    [Parameter]
+    public bool Loading { get; set; }
+}

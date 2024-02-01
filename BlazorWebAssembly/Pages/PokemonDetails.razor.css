@@ -1,0 +1,8 @@
+﻿img.tile-image {
+    transition: translate 20s;
+}
+
+img.tile-image:hover {
+    translate: 100vw;
+    transform: rotateY(180deg);
+}
