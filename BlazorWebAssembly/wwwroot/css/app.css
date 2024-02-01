@@ -5,3 +5,12 @@
 .pokemon-card-image{
     object-fit: contain;
 }
+
+.overlay-image-container {
+    position: absolute;
+}
+
+.overlay-image {
+    position: static;
+    opacity: 0.5;
+}

@@ -1,9 +1,71 @@
 ﻿@page "/"
 
 <PageTitle>Home</PageTitle>
-<Heading Size="HeadingSize.Is2">Hello, world!</Heading>
+
+<Div Class="overlay-image-container">
+    @for (int i = 1; i <= 289; i++)
+    {
+        var pokemonId = _randomGenerator.Next(1, 600);
+        var src = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + pokemonId.ToString() + ".png";
+        <Image Fluid Source="@src" Text="todo" Class="overlay-image"></Image>
+    }
+</Div>
 
 <Container Fluid>
-    Welcome to your new app.
+    <Row>
+        <Column ColumnSize="ColumnSize.Is6.OnWidescreen.Is12">
+            <Jumbotron Background="Background.Light" Margin="Margin.Is4.FromBottom.Is2.FromTop" TextAlignment="TextAlignment.Center">
+                <JumbotronTitle Size="JumbotronTitleSize.Is4">Welcome to the Pokemon Blazor Web Assembly!</JumbotronTitle>
+           
+                <Divider></Divider>
+                <Paragraph>
+                    This is a simple application built using C#, .Net 8, Blazor and uses the Blazorize.Material UI component library. <br />
+                    This site is currently hosted on the Google Cloud until April 11, 2024.
+                </Paragraph>
+            </Jumbotron>
+            <Card Padding="Padding.Is3">
+                <CardBody>
+                    <CardText>
+                        The goal of this project has been to create a simple Blazor application quickly to explore some of the features of the technology.
+                        Rather that create a new WebApi for this site a public API has been used. This has had some performance issues, as this API does 
+                        not provide much data in any LIST calls. Thus, in the source control there are places where I have had to make many API calls 
+                        get the data we need. <br /><br />
+
+                        See below the following links <br />
+
+                        C#: <Blazorise.Link To="https://learn.microsoft.com/en-us/dotnet/csharp/" Target="Target.Blank">learn.microsoft.com/en-us/dotnet/csharp</Blazorise.Link><br />
+                        .Net 8: <Blazorise.Link To="https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-8" Target="Target.Blank">learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-8</Blazorise.Link>  <br />
+                        Blazor: <Blazorise.Link To="https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor" Target="Target.Blank">dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor</Blazorise.Link> <br />
+                        Blazorise: <Blazorise.Link To="https://blazorise.com/" Target="Target.Blank">blazorise.com</Blazorise.Link> <br />
+                        Pokemon API: <Blazorise.Link To="https://pokeapi.co/docs/v2#pokemon" Target="Target.Blank">pokeapi.co/docs/v2#pokemon</Blazorise.Link> <br />
+                        GoogleCloud: <Blazorise.Link To="https://cloud.google.com/" Target="Target.Blank">cloud.google.com</Blazorise.Link> <br /><br />
+
+                        The source control for the project is found on Github: <Blazorise.Link To="https://github.com/luc37/BlazorWebAssembly" Target="Target.Blank">github.com/luc37/BlazorWebAssembly</Blazorise.Link>
+                    </CardText>
+                </CardBody>
+            </Card>
+            <Div TextAlignment="TextAlignment.Center" Margin="Margin.Is4.FromTop">
+                <Image Fluid Source="/google-cloud.png" Text="todo"></Image>
+                <Image Fluid Source="/GitHub-logo.png" Text="todo"></Image>
+             </Div>
+        </Column>
+        <Column ColumnSize="ColumnSize.Is6.OnWidescreen.Is12">
+            <Div TextAlignment="TextAlignment.Center">
+                <Image Fluid Source="/blazor-icon.png" Text="todo"></Image>
+                <Image Fluid Source="/blazorise-social-logo.png" Text="todo"></Image>
+                <Image Fluid Source="/dotnet8-preview-1.png" Text="todo"></Image>
+             </Div>
+        </Column>
+    </Row>
 </Container>
 
+@code{
+    private Random _randomGenerator = new Random();
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+
+    
+}
