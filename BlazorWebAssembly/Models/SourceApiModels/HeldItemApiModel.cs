@@ -1,8 +1,9 @@
 ﻿namespace BlazorWebAssembly.Models.SourceApiModels
 {
-    public class BaseApiModel
+    public class HeldItemApiModel
     {
+        public int Id { get; set; }
         public string Name { get; set; }
-        public string Url { get; set; }
+        public int Cost { get; set; }
     }
 }

@@ -24,7 +24,19 @@ else
                     </JumbotronSubtitle>
                 </Jumbotron>
             </Column>
-            <Column ColumnSize="ColumnSize.Is6.OnDesktop.Is12">
+            <Column ColumnSize="ColumnSize.Is3.OnDesktop.Is12">
+                <ListGroup>
+                    <ListGroupItem>
+                        <Paragraph>
+                            Base Experience: @_pokemon.Base_experience <br />
+                            Order: @_pokemon.Order <br />
+                            Height: @_pokemon.Height <br />
+                            Weight: @_pokemon.Weight <br />
+                        </Paragraph>
+                    </ListGroupItem>
+                </ListGroup>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is3.OnDesktop.Is12">
                 <img class="tile-image" src="@_pokemon.TileImageUrl" alt="todo" />
             </Column>
         </Row>
@@ -32,71 +44,73 @@ else
             <Column ColumnSize="ColumnSize.Is12">
                 <Tabs SelectedTab="@_selectedTab" SelectedTabChanged="@OnSelectedTabChanged" Class="scroll-x">
                     <Items>
-                        <Tab Name="general">General</Tab>
-                        <Tab Name="species">Species</Tab>
                         <Tab Name="abilities">Abilities</Tab>
+                        <Tab Name="species">Species</Tab>
                         <Tab Name="moves">Moves</Tab>
-                        <Tab Name="stats">Stats</Tab>
-                        <Tab Name="held_items">Held Items</Tab>
                     </Items>
                     <Content>
-                        <TabPanel Name="general">
-                            <Card>
-                                <CardBody>
-                                    <CardText>
-                                        Base Experience: @_pokemon.Base_experience <br />
-                                        Order: @_pokemon.Order <br />
-                                        Height: @_pokemon.Height <br />
-                                        Weight: @_pokemon.Weight <br />
-                                    </CardText>
-                                </CardBody>
-                            </Card>
-                        </TabPanel>
                         <TabPanel Name="species">
-                            <Card>
-                                <CardBody>
-                                    <CardText>
+                            <ListGroup>
+                                <ListGroupItem>
+                                    <Paragraph>
                                         Base Happiness: @_species.Base_happiness <br />
                                         Capture Rate: @_species.Capture_rate <br />
-                                    </CardText>
-                                </CardBody>
-                            </Card>
+                                    </Paragraph>
+                                </ListGroupItem>
+                            </ListGroup>
                         </TabPanel>
                         <TabPanel Name="abilities">
-                            <Card>
-                                <CardBody>
-                                    <CardText>
-                                        Content for abilities.
-                                    </CardText>
-                                </CardBody>
-                            </Card>
+                            <ListGroup>
+                                @foreach (var ability in _abilities)
+                                {  
+                                    <ListGroupItem>
+                                        <Div Flex="Flex.JustifyContent.Between" Width="Width.Is100">
+                                            <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom">@PageHelpers.GetProperName(ability.Name)</Heading>
+                                            <Small><Icon Name="IconName.Bug"></Icon></Small>
+                                        </Div>
+                                        <Paragraph Margin="Margin.Is1.FromBottom">
+                                            @ability.Effect_entries.First(x => x.Language.Name == "en").Effect
+                                        </Paragraph>
+                                        <Small>@("["+ability.Effect_entries.First(x => x.Language.Name == "en").Short_effect+"]")</Small>
+                                    </ListGroupItem>
+                                }
+                            </ListGroup>
                         </TabPanel>
                         <TabPanel Name="moves">
-                            <Card>
-                                <CardBody>
-                                    <CardText>
-                                        Content for moves.
-                                    </CardText>
-                                </CardBody>
-                            </Card>
-                        </TabPanel>
-                        <TabPanel Name="stats">
-                            <Card>
-                                <CardBody>
-                                    <CardText>
-                                        Content for stats.
-                                    </CardText>
-                                </CardBody>
-                            </Card>
-                        </TabPanel>
-                        <TabPanel Name="held_items">
-                            <Card>
-                                <CardBody>
-                                    <CardText>
-                                        Content for held_items.
-                                    </CardText>
-                                </CardBody>
-                            </Card>
+                            <CardDeck>
+                                @foreach (var move in _moves)
+                                {
+                                    <Card Class="move-card">
+                                        <CardBody>
+                                            <CardTitle TextAlignment="TextAlignment.Center" Size="5">@(PageHelpers.GetProperName(move.Name))</CardTitle>
+                                            <CardText>
+                                                <Table>
+                                                    <TableBody>
+                                                        <TableRow>
+                                                            <TableRowHeader>Accuracy</TableRowHeader>
+                                                            <TableRowCell>
+                                                                <Badge Width="Width.Is100" Color="Color.Primary">@(move.Accuracy ?? 0)</Badge>
+                                                            </TableRowCell>
+                                                        </TableRow>
+                                                        <TableRow>
+                                                            <TableRowHeader>Priority</TableRowHeader>
+                                                            <TableRowCell>
+                                                                <Badge Width="Width.Is100" Color="Color.Primary">@(move.Priority ?? 0)</Badge>
+                                                            </TableRowCell>
+                                                        </TableRow>
+                                                        <TableRow>
+                                                            <TableRowHeader>Power</TableRowHeader>
+                                                            <TableRowCell>
+                                                                <Badge Width="Width.Is100" Color="Color.Primary">@(move.Power ?? 0)</Badge>
+                                                            </TableRowCell>
+                                                        </TableRow>
+                                                    </TableBody>
+                                                </Table>
+                                            </CardText>
+                                        </CardBody>
+                                    </Card>
+                                }
+                            </CardDeck>
                         </TabPanel>
                     </Content>
                 </Tabs>
@@ -115,8 +129,10 @@ else
     private PokemonApiModel _sourcePokemon = new PokemonApiModel();
     private PokemonViewModel _pokemon = new PokemonViewModel();
     private SpeciesApiModel _species = new SpeciesApiModel();
+    private List<AbilityApiModel> _abilities = new List<AbilityApiModel>();
+    private List<MoveApiModel> _moves = new List<MoveApiModel>();
 
-    private string _selectedTab = "general";
+    private string _selectedTab = "abilities";
     private bool _loading = true;
     private bool _thrownError = false;
 
@@ -130,8 +146,12 @@ else
         try
         {
             _loading = true;
-            _sourcePokemon = await _pokemonApiService.GetPokemonDetails(url);
-            _species = await _pokemonApiService.GetSpeciesDetails(_sourcePokemon.Species.Url);
+            _sourcePokemon = await _pokemonApiService.GetSourceApiModelDetails<PokemonApiModel>(url);
+            _species = await _pokemonApiService.GetSourceApiModelDetails<SpeciesApiModel>(_sourcePokemon.Species.Url);
+            _abilities = await _pokemonApiService
+                .GetListSourceApiModelDetails<AbilityApiModel>(_sourcePokemon.Abilities.Select(x => x.Ability).ToList());
+            _moves = await _pokemonApiService
+                .GetListSourceApiModelDetails<MoveApiModel>(_sourcePokemon.Moves.Select(x => x.Move).ToList());
             _pokemon = new PokemonViewModel
             {
                 Name = _sourcePokemon.Name,
@@ -143,7 +163,6 @@ else
                 Weight = _sourcePokemon.Weight,
                 FlavourText = _species.Flavor_text_entries[0].Flavor_text
             };
-            
         }
         catch
         {

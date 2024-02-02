@@ -14,3 +14,8 @@
     position: static;
     opacity: 0.5;
 }
+
+.stat-card,
+.move-card{
+    min-width: 200px !important;
+}

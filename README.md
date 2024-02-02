@@ -26,7 +26,8 @@ Run a file publish in VS 2022.
 Copy files and folders to the bucket.
 
 Live site:
-blazor.dexterdevelopment.uk
+https://blazor.dexterdevelopment.uk
 
-Current issues:
+Known issues:
 Loading a page via URL return an XML page.
+Nature of API means that to get listed data too many calls are needed per page.

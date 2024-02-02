@@ -13,16 +13,23 @@ namespace BlazorWebAssembly.Services.Api.Implementations
             return response;
         }
 
-        public async Task<PokemonApiModel> GetPokemonDetails(string apiUrl)
+        public async Task<T> GetSourceApiModelDetails<T>(string apiUrl) where T : class, new()
         {
-            PokemonApiModel? sourcePokemon = await _apiService.InvokeApiRequestGetAsync<PokemonApiModel>(apiUrl);
-            return sourcePokemon;
+            T? item = await _apiService.InvokeApiRequestGetAsync<T>(apiUrl);
+            return item;
         }
 
-        public async Task<SpeciesApiModel> GetSpeciesDetails(string apiUrl)
+        public async Task<List<T>> GetListSourceApiModelDetails<T>(List<LookUpApiModel> lookUps) where T : class, new()
         {
-            SpeciesApiModel? sourceSpecies = await _apiService.InvokeApiRequestGetAsync<SpeciesApiModel>(apiUrl);
-            return sourceSpecies;
+            var result = new List<T>();
+
+            for(int i = 0; i < lookUps.Count; i++)
+            {
+                T? item = await _apiService.InvokeApiRequestGetAsync<T>(lookUps[i].Url);
+                result.Add(item);
+            }
+
+            return result;
         }
     }
 }
