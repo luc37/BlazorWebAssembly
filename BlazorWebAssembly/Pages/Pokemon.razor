@@ -16,6 +16,11 @@ else
 {
     <Container Fluid>
         @if(_viewType == ViewType.Table){
+            <Paginator Pages="_numberOfPages"
+                       NextPage="OnNextPageEvent"
+                       PreviousPage="OnPreviousPageEvent"
+                       PageChange="OnPageChangeEvent"
+                       CurrentPage="_currentPage" />
             <Table Hoverable Bordered FixedColumns Resizable ResizeMode="TableResizeMode.Header">
                     <TableHeader>
                         <TableRow>
@@ -57,9 +62,12 @@ else
 
         @if (_viewType == ViewType.Grid)
         {
-
+            <Paginator Pages="_numberOfPages"
+                       NextPage="OnNextPageEvent"
+                       PreviousPage="OnPreviousPageEvent"
+                       PageChange="OnPageChangeEvent"
+                       CurrentPage="_currentPage" />
             <Button Margin="Margin.Is2" Clicked="@(() => ToggleView(ViewType.Table))"><Icon Name="IconName.Bars" /></Button>
-
             <CardDeck>
                 @foreach (var pokemon in _pokemon)
                 {
