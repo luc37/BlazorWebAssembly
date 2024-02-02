@@ -25,5 +25,8 @@ Publish to Google Cloud buckets.
 Run a file publish in VS 2022.
 Copy files and folders to the bucket.
 
+Live site:
+blazor.dexterdevelopment.uk
+
 Current issues:
 Loading a page via URL return an XML page.
