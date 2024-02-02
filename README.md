@@ -24,3 +24,6 @@ Current Deployment:
 Publish to Google Cloud buckets. 
 Run a file publish in VS 2022.
 Copy files and folders to the bucket.
+
+Current issues:
+Loading a page via URL return an XML page.
