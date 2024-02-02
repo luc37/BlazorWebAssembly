@@ -1,0 +1,45 @@
+﻿@inject IJSRuntime JsRuntime
+@inject IResizeListener listener
+@implements IDisposable
+
+<!--
+    A means of placing a tiled x*y faded grid of random pokemon as a background onto a page. 
+    The height and width of this rendered components are determined by the 'ContainerName' parameter.
+    That 'ContainerName' must refer to an id in the HTML on the page.
+    This relies upon js/app-script.js which contains the JS functions to get the height and width.
+-->
+
+<Div Class="overlay-image-container">
+    @for (int i = 1; i <= _backgroundPokemonCount; i++)
+    {
+        var pokemonId = _randomGenerator.Next(1, 600);
+        var src = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + pokemonId.ToString() + ".png";
+        <Image Fluid Source="@src" Text="todo" Class="overlay-image"></Image>
+    }
+</Div>
+
+@code {
+    [Parameter] public string ContainerName { get; set; }
+
+    private Random _randomGenerator = new Random();
+    private int _backgroundPokemonCount { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+            listener.OnResized += WindowResized;
+    }
+
+    void IDisposable.Dispose()
+    {
+        listener.OnResized -= WindowResized;
+    }
+
+    async void WindowResized(object _, BrowserWindowSize window)
+    {
+        var width = await JsRuntime.InvokeAsync<int>("appGetElementWidthById", ContainerName);
+        var height = await JsRuntime.InvokeAsync<int>("appGetElementHeightById", ContainerName);
+        _backgroundPokemonCount = (width / Constants.pokemonTileWidth) * (height / Constants.pokemonTileHeight);
+        StateHasChanged();
+    }
+}

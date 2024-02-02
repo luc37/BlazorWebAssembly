@@ -12,5 +12,10 @@
         //ROUTES
         public const string HomeRoute = "/";
         public const string PokemonRoute = "/pokemon";
+
+        //IMAGESIZES
+        public const int pokemonTileHeight = 96;
+        public const int pokemonTileWidth = 96;
+
     }
 }

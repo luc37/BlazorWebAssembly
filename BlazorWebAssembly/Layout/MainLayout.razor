@@ -1,22 +1,24 @@
 ﻿@inherits LayoutComponentBase
-<Layout>
-    <LayoutHeader Fixed>
-        <TopBar />
-    </LayoutHeader>
-    <Layout Sider>
-        <LayoutSider>
-            <LayoutSiderContent>
-                <div class="move-down">
-                    <SideNav />
-                </div>
-            </LayoutSiderContent>
-        </LayoutSider>
-        <Layout>
-            <LayoutContent>
-                <div class="page">
-                    @Body
-                </div>
-            </LayoutContent>
+<MediaQueryList>
+    <Layout>
+        <LayoutHeader Fixed>
+            <TopBar />
+        </LayoutHeader>
+        <Layout Sider>
+            <LayoutSider>
+                <LayoutSiderContent>
+                    <div class="move-down">
+                        <SideNav />
+                    </div>
+                </LayoutSiderContent>
+            </LayoutSider>
+            <Layout>
+                <LayoutContent>
+                    <div class="page">
+                        @Body
+                    </div>
+                </LayoutContent>
+            </Layout>
         </Layout>
     </Layout>
-</Layout>
+</MediaQueryList>

@@ -2,18 +2,11 @@
 
 <PageTitle>Home</PageTitle>
 
-<Div Class="overlay-image-container">
-    @for (int i = 1; i <= 289; i++)
-    {
-        var pokemonId = _randomGenerator.Next(1, 600);
-        var src = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + pokemonId.ToString() + ".png";
-        <Image Fluid Source="@src" Text="todo" Class="overlay-image"></Image>
-    }
-</Div>
+<PokemonTileBackground ContainerName="home-container"></PokemonTileBackground>
 
-<Container Fluid>
+<Container Fluid id="home-container">
     <Row>
-        <Column ColumnSize="ColumnSize.Is6.OnWidescreen.Is12">
+        <Column ColumnSize="ColumnSize.Is6.OnFullHD.Is12">
             <Jumbotron Background="Background.Light" Margin="Margin.Is4.FromBottom.Is2.FromTop" TextAlignment="TextAlignment.Center">
                 <JumbotronTitle Size="JumbotronTitleSize.Is4">Welcome to the Pokemon Blazor Web Assembly!</JumbotronTitle>
            
@@ -49,7 +42,7 @@
                 <Image Fluid Source="/GitHub-logo.png" Text="todo"></Image>
              </Div>
         </Column>
-        <Column ColumnSize="ColumnSize.Is6.OnWidescreen.Is12">
+         <Column ColumnSize="ColumnSize.Is6.OnFullHD.Is12">
             <Div TextAlignment="TextAlignment.Center">
                 <Image Fluid Source="/blazor-icon.png" Text="todo"></Image>
                 <Image Fluid Source="/blazorise-social-logo.png" Text="todo"></Image>
@@ -58,14 +51,3 @@
         </Column>
     </Row>
 </Container>
-
-@code{
-    private Random _randomGenerator = new Random();
-
-    protected override async Task OnInitializedAsync()
-    {
-        
-    }
-
-    
-}

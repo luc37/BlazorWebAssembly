@@ -1,6 +1,7 @@
 using Blazorise;
 using Blazorise.Icons.Material;
 using Blazorise.Material;
+using BlazorPro.BlazorSize;
 using BlazorWebAssembly;
 using BlazorWebAssembly.Services.Api.Implementations;
 using BlazorWebAssembly.Services.Api.Interfaces;
@@ -25,5 +26,8 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 //IOC
 builder.Services.AddTransient<IApiService, ApiService>();
 builder.Services.AddTransient<IPokemonApiService, PokemonApiService>();
+
+builder.Services.AddMediaQueryService();
+builder.Services.AddScoped<IResizeListener, ResizeListener>();
 
 await builder.Build().RunAsync();
