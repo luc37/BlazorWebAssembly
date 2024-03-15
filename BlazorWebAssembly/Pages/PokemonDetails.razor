@@ -25,16 +25,7 @@ else
                 </Jumbotron>
             </Column>
             <Column ColumnSize="ColumnSize.Is3.OnDesktop.Is12">
-                <ListGroup>
-                    <ListGroupItem>
-                        <Paragraph>
-                            Base Experience: @_pokemon.Base_experience <br />
-                            Order: @_pokemon.Order <br />
-                            Height: @_pokemon.Height <br />
-                            Weight: @_pokemon.Weight <br />
-                        </Paragraph>
-                    </ListGroupItem>
-                </ListGroup>
+                <AppRadarChart Labels="@_chartLabels" ChartData="@_chartData" Name="@Name"></AppRadarChart>
             </Column>
             <Column ColumnSize="ColumnSize.Is3.OnDesktop.Is12">
                 <img class="tile-image" src="@_pokemon.TileImageUrl" alt="todo" />
@@ -51,6 +42,14 @@ else
                     <Content>
                         <TabPanel Name="species">
                             <ListGroup>
+                                <ListGroupItem>
+                                    <Paragraph>
+                                        Base Experience: @_pokemon.Base_experience <br />
+                                        Order: @_pokemon.Order <br />
+                                        Height: @_pokemon.Height <br />
+                                        Weight: @_pokemon.Weight <br />
+                                    </Paragraph>
+                                </ListGroupItem>
                                 <ListGroupItem>
                                     <Paragraph>
                                         Base Happiness: @_species.Base_happiness <br />
@@ -132,6 +131,9 @@ else
     private List<AbilityApiModel> _abilities = new List<AbilityApiModel>();
     private List<MoveApiModel> _moves = new List<MoveApiModel>();
 
+    private string[] _chartLabels = { "Experience", "Height", "Weight", "Happiness", "Capture Rate", "# Moves" };
+    private List<int> _chartData = new List<int>();
+
     private string _selectedTab = "abilities";
     private bool _loading = true;
     private bool _thrownError = false;
@@ -139,6 +141,15 @@ else
     protected override async Task OnInitializedAsync()
     {
         await GetPageData(ApiCall + "/" + Name);
+        _chartData = new List<int>
+        {
+            (_sourcePokemon?.Base_experience * 100) / 400 ?? 0,
+            (_sourcePokemon?.Height * 100) / 200  ?? 0,
+            (_sourcePokemon?.Weight * 100) / 10000 ?? 0,
+            (_species?.Base_happiness * 100) / 150 ?? 0,
+            (_species?.Capture_rate * 100) / 260 ?? 0,
+            (_sourcePokemon?.Moves.Count * 100) / 250 ?? 0
+        };
     }
 
     private async Task GetPageData(string url)
